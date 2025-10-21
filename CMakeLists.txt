@@ -49,6 +49,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
 set(SDFormat_VERSION 15)
 find_package(sdformat${SDFormat_VERSION} REQUIRED)
 
+# For parsing MuJoCo XML files
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(TinyXML2 REQUIRED tinyxml2)
+
 # ##############################################################################
 # Dynamics library
 # ##############################################################################
@@ -92,6 +96,7 @@ message(STATUS "CMAKE_CXX_COMPILER_VERSION                  : ${CMAKE_CXX_COMPIL
 message(STATUS "GTSAM Version                               : ${GTSAM_VERSION}")
 message(STATUS "Boost Version                               : ${Boost_VERSION}")
 message(STATUS "SDFormat Version                            : ${sdformat${SDFormat_VERSION}_VERSION}")
+message(STATUS "TinyXML2 Version                            : ${TinyXML2_VERSION}")
 
 if(TBB_FOUND)
   message(STATUS "Use Intel TBB                               : Yes (${TBB_VERSION})")

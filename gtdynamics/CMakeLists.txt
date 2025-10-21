@@ -60,7 +60,7 @@ add_library(gtdynamics SHARED ${sources} ${headers})
 set_target_properties(gtdynamics PROPERTIES LINKER_LANGUAGE CXX)
 
 ## Link all dependencies
-target_link_libraries(gtdynamics PUBLIC ${GTSAM_LIBS} ${SDFormat_LIBRARIES})
+target_link_libraries(gtdynamics PUBLIC ${GTSAM_LIBS} ${SDFormat_LIBRARIES} ${TinyXML2_LIBRARIES})
 
 target_link_libraries(gtdynamics PUBLIC ${GTDYNAMICS_ADDITIONAL_LIBRARIES})
 
@@ -79,6 +79,7 @@ target_include_directories(gtdynamics BEFORE PUBLIC
 )
 
 target_include_directories(gtdynamics PUBLIC ${SDFormat_INCLUDE_DIRS})
+target_include_directories(gtdynamics PUBLIC ${TinyXML2_INCLUDE_DIRS})
 
 
 ## Install library and headers.
