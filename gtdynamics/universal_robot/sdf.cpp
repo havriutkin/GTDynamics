@@ -18,6 +18,7 @@
 #include <gtdynamics/universal_robot/RevoluteJoint.h>
 #include <gtdynamics/universal_robot/sdf.h>
 #include <gtdynamics/universal_robot/sdf_internal.h>
+#include <gtdynamics/universal_robot/mjcf.h>
 
 #include <fstream>
 #include <sdf/parser.hh>
@@ -323,6 +324,38 @@ Robot CreateRobotFromFile(const std::string &file_path,
   auto links_joints_pair =
       ExtractRobotFromFile(file_path, model_name, preserve_fixed_joint);
   return Robot(links_joints_pair.first, links_joints_pair.second);
+}
+
+Robot CreateRobotFromFileAutoDetect(const std::string &file_path,
+                                    const std::string &model_name,
+                                    bool preserve_fixed_joint) {
+  std::ifstream is(file_path);
+  if (!is.good())
+    throw std::runtime_error("CreateRobotFromFileAutoDetect: no file found at " +
+                             file_path);
+  is.close();
+
+  std::string file_ext = file_path.substr(file_path.find_last_of(".") + 1);
+  std::transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
+
+  if (file_ext == "xml") {
+    // For .xml files, check if it's a MuJoCo MJCF file by looking for <mujoco> tag
+    std::ifstream file(file_path);
+    std::string content((std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
+    file.close();
+    
+    if (content.find("<mujoco") != std::string::npos) {
+      return CreateRobotFromMJCF(file_path, model_name);
+    } else {
+      // Assume it's an SDF file
+      return CreateRobotFromFile(file_path, model_name, preserve_fixed_joint);
+    }
+  } else if (file_ext == "urdf" || file_ext == "sdf") {
+    return CreateRobotFromFile(file_path, model_name, preserve_fixed_joint);
+  } else {
+    throw std::runtime_error("Unsupported file extension: " + file_ext);
+  }
 }
 
 }  // namespace gtdynamics

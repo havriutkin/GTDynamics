@@ -1,0 +1,14 @@
+<mujoco model="simple_pendulum">
+  <compiler angle="radian"/>
+  
+  <worldbody>
+    <body name="base" pos="0 0 0">
+      <inertial pos="0 0 0" mass="1.0" diaginertia="0.1 0.1 0.1"/>
+      <freejoint/>
+      <body name="link1" pos="0 0 0.5">
+        <inertial pos="0 0 0.5" mass="2.0" diaginertia="0.2 0.2 0.2"/>
+        <joint name="joint1" type="hinge" axis="1 0 0" range="-1.57 1.57" damping="0.5"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>
