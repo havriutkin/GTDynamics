@@ -1,0 +1,16 @@
+# Requirements for the humanoid walking MuJoCo example notebook
+# 
+# Install with: pip install -r requirements_humanoid_walking.txt
+
+# Core dependencies (should already be installed if GTDynamics Python bindings are built)
+numpy>=1.20.0
+gtsam>=4.0.0
+gtdynamics
+
+# Visualization dependencies
+matplotlib>=3.3.0
+mujoco>=2.3.0
+
+# Jupyter notebook support
+jupyter>=1.0.0
+ipykernel>=6.0.0
