@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="inverted_pendulum_scene">
+
+  <!-- 
+    The compiler tag is crucial. 
+    'angle="radian"' ensures URDF RPY values are interpreted correctly.
+    'autolimits="true"' generates joint limits if they are missing.
+  -->
+  <compiler angle="radian" autolimits="true"/>
+
+  <option integrator="RK4" timestep="0.001"/>
+
+  <asset>
+    <texture type="skybox" builtin="flat" rgb1="0 0 0" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+      rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+      reflectance="0.2" />
+  </asset>
+
+  <worldbody>
+    <!-- Basic lighting and ground plane for visualization -->
+    <light diffuse="0.8 0.8 0.8" pos="0 0 4" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="5 5 0.1" type="plane" material="groundplane" />
+    
+    <!-- 
+      This body acts as a mount for your URDF model.
+      The 'pos' attribute moves the base of your robot.
+      Since your base link 'l1' is a 0.05 cube, positioning it at z=0.025
+      will make it rest perfectly on the ground.
+    -->
+    <body pos="0 0 0.025">
+      <!-- This line imports and compiles your URDF file into the scene -->
+      <include file="inverted_pendulum.urdf"/>
+    </body>
+  </worldbody>
+  
+  <actuator>
+    <!-- 
+      A motor to control the 'j1' joint from your URDF.
+      This allows you to apply torque and interact with the model.
+    -->
+    <motor joint="j1" name="torque" gear="1" ctrllimited="true" ctrlrange="-100 100" />
+  </actuator>
+
+</mujoco>
+
