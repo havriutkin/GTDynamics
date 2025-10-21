@@ -2,6 +2,18 @@
 
 This directory contains a Jupyter notebook demonstrating a walking humanoid robot using GTDynamics and MuJoCo.
 
+![Humanoid Walking Animation](https://img.shields.io/badge/Status-Ready-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![MuJoCo](https://img.shields.io/badge/MuJoCo-2.3+-orange)
+
+## Overview
+
+This example demonstrates full kinodynamic trajectory optimization for a bipedal humanoid robot:
+- Multi-phase contact dynamics with alternating foot support
+- Trajectory optimization with GTDynamics factor graphs
+- 3D visualization using MuJoCo physics simulator
+- Matplotlib plots for trajectory analysis
+
 ## File: `humanoid_walking_mujoco.ipynb`
 
 This notebook demonstrates:
