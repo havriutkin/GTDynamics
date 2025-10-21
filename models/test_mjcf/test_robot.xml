@@ -1,0 +1,35 @@
+<mujoco model="test_robot">
+  <compiler angle="radian"/>
+  
+  <worldbody>
+    <!-- Base link with free joint (floating base) -->
+    <body name="base" pos="0 0 0.5">
+      <inertial pos="0 0 0" mass="10.0" diaginertia="1.0 1.0 1.0" quat="1 0 0 0"/>
+      <freejoint/>
+      
+      <!-- Revolute joint with explicit axis and limits -->
+      <body name="link1" pos="0.5 0 0">
+        <inertial pos="0 0 0" mass="2.0" diaginertia="0.1 0.1 0.1"/>
+        <joint name="joint1" type="hinge" axis="0 0 1" range="-1.57 1.57" damping="1.0"/>
+        
+        <!-- Prismatic joint -->
+        <body name="link2" pos="0.3 0 0">
+          <inertial pos="0 0 0" mass="1.5" diaginertia="0.05 0.05 0.05"/>
+          <joint name="joint2" type="slide" axis="1 0 0" range="0 0.5" damping="0.5"/>
+          
+          <!-- Joint with default axis (should be Z) -->
+          <body name="link3" pos="0.2 0 0">
+            <inertial pos="0 0 0" mass="1.0" diaginertia="0.02 0.02 0.02"/>
+            <joint name="joint3" range="-3.14 3.14"/>
+          </body>
+        </body>
+      </body>
+      
+      <!-- Another branch from base -->
+      <body name="link4" pos="0 0.3 0" quat="0.707107 0 0 0.707107">
+        <inertial pos="0.1 0 0" mass="1.0" diaginertia="0.03 0.03 0.03" quat="0.924 0 0.383 0"/>
+        <joint name="joint4" type="hinge" axis="0 1 0" range="-0.5 0.5"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

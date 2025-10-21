@@ -204,42 +204,49 @@ static void parseBody(const tinyxml2::XMLElement* bodyElem,
   // Parse inertial properties
   body.inertial = parseInertial(bodyElem);
   
-  // Check for joint element
-  const tinyxml2::XMLElement* jointElem = bodyElem->FirstChildElement("joint");
-  if (jointElem) {
-    body.has_joint = true;
-    
-    // Get joint name
-    const char* jointNameAttr = jointElem->Attribute("name");
-    if (jointNameAttr) {
-      body.joint_name = jointNameAttr;
-    } else {
-      body.joint_name = body.name + "_joint";
-    }
-    
-    // Determine joint type (default is hinge/revolute)
-    const char* typeAttr = jointElem->Attribute("type");
-    if (typeAttr) {
-      body.joint_type = typeAttr;
-    } else {
-      body.joint_type = "hinge";  // Default in MuJoCo
-    }
-    
-    // Parse joint axis
-    body.joint_axis = parseAxis(jointElem, "axis");
-    
-    // Parse joint range
-    const char* rangeStr = jointElem->Attribute("range");
-    if (rangeStr) {
-      auto vals = parseDoubles(rangeStr);
-      if (vals.size() == 2) {
-        body.joint_lower_limit = vals[0];
-        body.joint_upper_limit = vals[1];
+  // Check for freejoint element (indicates base link with 6 DOF)
+  const tinyxml2::XMLElement* freeJointElem = bodyElem->FirstChildElement("freejoint");
+  if (freeJointElem) {
+    // This is a floating base - no joint to parent
+    body.has_joint = false;
+  } else {
+    // Check for regular joint element
+    const tinyxml2::XMLElement* jointElem = bodyElem->FirstChildElement("joint");
+    if (jointElem) {
+      body.has_joint = true;
+      
+      // Get joint name
+      const char* jointNameAttr = jointElem->Attribute("name");
+      if (jointNameAttr) {
+        body.joint_name = jointNameAttr;
+      } else {
+        body.joint_name = body.name + "_joint";
       }
+      
+      // Determine joint type (default is hinge/revolute)
+      const char* typeAttr = jointElem->Attribute("type");
+      if (typeAttr) {
+        body.joint_type = typeAttr;
+      } else {
+        body.joint_type = "hinge";  // Default in MuJoCo
+      }
+      
+      // Parse joint axis
+      body.joint_axis = parseAxis(jointElem, "axis");
+      
+      // Parse joint range
+      const char* rangeStr = jointElem->Attribute("range");
+      if (rangeStr) {
+        auto vals = parseDoubles(rangeStr);
+        if (vals.size() == 2) {
+          body.joint_lower_limit = vals[0];
+          body.joint_upper_limit = vals[1];
+        }
+      }
+      
+      // Parse damping
+      jointElem->QueryDoubleAttribute("damping", &body.joint_damping);
     }
-    
-    // Parse damping
-    jointElem->QueryDoubleAttribute("damping", &body.joint_damping);
   }
   
   // Add this body to the list
