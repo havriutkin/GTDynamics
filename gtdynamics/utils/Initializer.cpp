@@ -374,9 +374,12 @@ Values Initializer::ZeroValues(
   }
 
   if (contact_points) {
+    // Group contact points by link to assign unique IDs
+    std::map<int, int> link_contact_count;
     for (auto&& cp : *contact_points) {
-      // TODO(frank): allow multiple contact points on one link, id = 0,1,2...
-      values.insert(ContactWrenchKey(cp.link->id(), 0, t), sampler.sample());
+      int link_id = cp.link->id();
+      int contact_id = link_contact_count[link_id]++;
+      values.insert(ContactWrenchKey(link_id, contact_id, t), sampler.sample());
     }
   }
 

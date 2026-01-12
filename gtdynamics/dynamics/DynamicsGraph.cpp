@@ -293,10 +293,10 @@ gtsam::NonlinearFactorGraph DynamicsGraph::dynamicsFactors(
 
       // Add wrench keys for contact points.
       if (contact_points) {
+        int contact_id = 0;  // Unique contact ID per link
         for (auto &&cp : *contact_points) {
           if (cp.link->id() != i) continue;
-          // TODO(frank): allow multiple contact points on one link, id = 0,1,..
-          auto wrench_key = ContactWrenchKey(i, 0, k);
+          auto wrench_key = ContactWrenchKey(i, contact_id++, k);
           wrench_keys.push_back(wrench_key);
 
           // Add contact dynamics constraints.
