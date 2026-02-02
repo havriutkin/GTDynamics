@@ -25,10 +25,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+# Default minimal permissions for all jobs
+permissions:
+  contents: read
+
 jobs:
   build_wheels:
     name: Build wheel - ${{ matrix.os }} - Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -50,6 +56,7 @@ jobs:
       - name: Install Python build dependencies
         run: |
           python -m pip install --upgrade pip
+          # Pin setuptools<70 to avoid breaking changes in setuptools 70+ with PEP 660 builds
           python -m pip install -U "setuptools<70" wheel numpy pyparsing pyyaml "pybind11-stubgen>=2.5.1" build
 
       - name: Install system dependencies (Linux)
@@ -59,9 +66,10 @@ jobs:
           sudo apt-get -y update
           sudo apt-get install -y g++ libtbb-dev libboost-all-dev cmake
 
-          # Add SDFormat repository
-          sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
+          # Add SDFormat repository with proper GPG key handling
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL http://packages.osrfoundation.org/gazebo.key | sudo gpg --dearmor -o /etc/apt/keyrings/gazebo-stable.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/gazebo-stable.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
           sudo apt-get -y update
           sudo apt-get -y install libsdformat15-dev
 
@@ -193,6 +201,8 @@ jobs:
     name: Combine wheel artifacts
     needs: build_wheels
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Download all wheel artifacts
         uses: actions/download-artifact@v4
@@ -220,6 +230,7 @@ jobs:
       name: pypi
       url: https://pypi.org/p/gtdynamics
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Download wheels
