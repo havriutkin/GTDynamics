@@ -1,6 +1,10 @@
 # CI Workflows
 
-GTDynamics has two GitHub Actions workflows that run on every pull request:
+GTDynamics has the following GitHub Actions workflows:
+
+## Pull Request Workflows
+
+These run on every pull request:
 
 - `.github/workflows/linux-ci.yml`
 - `.github/workflows/macos-ci.yml`
@@ -47,3 +51,42 @@ Because GTSAM is installed under a workspace prefix in CI (not a system default)
 - **Linux:** `LD_LIBRARY_PATH` is set to `${GTSAM_INSTALL_DIR}/lib` for Python tests, and for gcc C++ tests as needed.
 
 For local "build from source like CI" instructions, see the top-level `README.md` (section at the end).
+
+## Python Wheel Build Workflow
+
+The workflow `.github/workflows/build-wheels.yml` builds Python wheels for distribution:
+
+### Triggers
+
+- **Push to main/master/develop branches:** Builds wheels for testing
+- **Version tags (v*):** Builds and optionally uploads to PyPI
+- **Pull requests:** Builds wheels to validate the PR
+- **Manual dispatch:** Allows manual builds with optional PyPI upload
+
+### Build Matrix
+
+The workflow builds wheels for:
+
+- **Operating Systems:**
+  - Ubuntu 24.04 (Linux x86_64)
+  - macOS 13 (Intel x86_64)
+  - macOS 14 (Apple Silicon arm64)
+
+- **Python Versions:** 3.10, 3.11, 3.12
+
+### Build Process
+
+1. **Install system dependencies:** Boost, SDFormat 15, CppUnitLite
+2. **Build GTSAM from source:** With Python bindings enabled
+3. **Configure and build GTDynamics:** With Python wrapper support
+4. **Build wheel:** Using `python -m build` in the build/python directory
+5. **Verify wheel:** Test import in a fresh environment
+6. **Upload artifacts:** Combined wheels available for download
+
+### PyPI Publishing
+
+Wheels are automatically published to PyPI when:
+- A version tag (e.g., `v1.0.0`) is pushed, OR
+- Manual workflow dispatch with `upload_to_pypi` set to `true`
+
+**Note:** PyPI publishing requires configuring the `pypi` environment in GitHub repository settings with trusted publisher authentication.
